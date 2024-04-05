@@ -31,6 +31,16 @@ final class Main
         incrementThread.start();
         decrementThread.start();
 
+        try
+        {
+            incrementThread.join();
+            decrementThread.join();
+        }
+        catch (InterruptedException ex)
+        {
+
+        }
+
         System.out.println("Total Value: " + counter.getValue());
     }
 }

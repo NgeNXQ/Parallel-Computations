@@ -7,7 +7,7 @@ public final class Counter
 {
     private volatile int value = 0;
 
-    private Lock lock = new ReentrantLock();
+    private final Lock lock = new ReentrantLock();
 
     public int getValue()
     {
