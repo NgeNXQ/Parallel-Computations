@@ -42,7 +42,7 @@ public final class MainFrame extends JFrame
 
         this.setSize(this.FRAME_WIDTH, this.FRAME_HEIGHT);
 
-        //System.out.println("In Frame Thread name = " + Thread.currentThread().getName());
+        System.out.println("In Frame Thread name = " + Thread.currentThread().getName());
 
         this.panelButtons = new JPanel();
         this.panelButtons.setBackground(Color.lightGray);
