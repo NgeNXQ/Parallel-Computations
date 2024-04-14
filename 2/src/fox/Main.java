@@ -6,25 +6,32 @@ public class Main
 {
     public static void main(String[] args)
     {
-        final int ROWS_COUNT = 1500;
-        final int COLUMNS_COUNT = 1500;
-
         final int MIN_VALUE = 0;
         final int MAX_VALUE = 1000;
 
-        final int THREADS_COUNT = 25;
+        Result result;
+        MatrixInt matrix1;
+        MatrixInt matrix2;
 
-        final MatrixInt matrix1 = new MatrixInt(ROWS_COUNT, COLUMNS_COUNT);
-        final MatrixInt matrix2 = new MatrixInt(ROWS_COUNT, COLUMNS_COUNT);
+        int[] threads = {4, 9, 25};
+        int[] dimensions = {500, 1000, 1500, 2000, 2500, 3000};
 
-        matrix1.fill(MIN_VALUE, MAX_VALUE);
-        matrix2.fill(MIN_VALUE, MAX_VALUE);
+        for (int thread : threads)
+        {
+            for (int dimension : dimensions)
+            {
+                System.out.print(String.format("Threads: %d; Dimensions: %d | ", thread, dimension));
 
-        System.out.println("...");
+                matrix1 = new MatrixInt(dimension, dimension);
+                matrix2 = new MatrixInt(dimension, dimension);
 
-        Result result1 = MatrixInt.multiplySequential(matrix1, matrix2);
-        Result result2 = MatrixInt.multiplyFox(matrix1, matrix2, THREADS_COUNT);
+                matrix1.fill(MIN_VALUE, MAX_VALUE);
+                matrix2.fill(MIN_VALUE, MAX_VALUE);
 
-        System.out.println(MatrixInt.AreEqual(result1.getMatrixInt(), result2.getMatrixInt()));
+                result = MatrixInt.multiplyFox(matrix1, matrix2, thread);
+
+                result.printResults();
+            }
+        }
     }
 }

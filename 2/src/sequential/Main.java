@@ -6,20 +6,28 @@ public class Main
 {
     public static void main(String[] args)
     {
-        final int ROWS_COUNT = 1500;
-        final int COLUMNS_COUNT = 1500;
-
         final int MIN_VALUE = 0;
         final int MAX_VALUE = 1000;
 
-        final MatrixInt matrix1 = new MatrixInt(ROWS_COUNT, COLUMNS_COUNT);
-        final MatrixInt matrix2 = new MatrixInt(ROWS_COUNT, COLUMNS_COUNT);
+        Result result;
+        MatrixInt matrix1;
+        MatrixInt matrix2;
 
-        matrix1.fill(MIN_VALUE, MAX_VALUE);
-        matrix2.fill(MIN_VALUE, MAX_VALUE);
+        int[] dimensions = {500, 1000, 1500, 2000, 2500, 3000};
 
-        System.out.println("...");
+        for (int dimension : dimensions)
+        {
+            System.out.print(String.format("Dimensions: %d | ", dimension));
 
-        Result result = MatrixInt.multiplySequential(matrix1, matrix2);
+            matrix1 = new MatrixInt(dimension, dimension);
+            matrix2 = new MatrixInt(dimension, dimension);
+
+            matrix1.fill(MIN_VALUE, MAX_VALUE);
+            matrix2.fill(MIN_VALUE, MAX_VALUE);
+
+            result = MatrixInt.multiplySequential(matrix1, matrix2);
+
+            result.printResults();
+        }
     }
 }

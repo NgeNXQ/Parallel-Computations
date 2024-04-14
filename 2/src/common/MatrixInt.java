@@ -153,13 +153,13 @@ public final class MatrixInt
 
         long timestepStart = System.currentTimeMillis();
 
-        for (int i = 0; i < matrix1.rows; ++i)
+        for (int rowIndex = 0; rowIndex < matrix1.rows; ++rowIndex)
         {
-            for (int j = 0; j < matrix2.columns; ++j)
+            for (int columnIndex = 0; columnIndex < matrix2.columns; ++columnIndex)
             {
-                for (int k = 0; k < matrix1.columns; ++k)
+                for (int dimensionIndex = 0; dimensionIndex < matrix1.columns; ++dimensionIndex)
                 {
-                    resultingMatrix.matrix[i][j] += matrix1.matrix[i][k] * matrix2.matrix[k][j];
+                    resultingMatrix.matrix[rowIndex][columnIndex] += matrix1.matrix[rowIndex][dimensionIndex] * matrix2.matrix[dimensionIndex][columnIndex];
                 }
             }
         }
@@ -173,125 +173,66 @@ public final class MatrixInt
         return result;
     }
 
-    public static Result multiplyStriped(MatrixInt matrix1, MatrixInt matrix2, int threadsCount)
-    {
-        if (!MatrixInt.areMultipliable(matrix1, matrix2))
-        {
-            throw new IllegalArgumentException("Matrices are not multipliable.");
-        }
-    
-        MatrixInt resultingMatrix = new MatrixInt(matrix1.rows, matrix2.columns);
-    
-        long timestepStart = System.currentTimeMillis();
-    
-        int totalTasks = matrix1.rows * matrix2.columns;
-        int tasksPerThread = totalTasks / threadsCount;
-        
-        Thread[] threads = new Thread[threadsCount];
-        
-        for (int i = 0; i < threadsCount; ++i) 
-        {
-            final int THREAD_ID = i;
-    
-            threads[i] = new Thread(() -> 
-            {
-                int startTaskIndex = THREAD_ID * tasksPerThread;
-                int endTaskIndex = (THREAD_ID == threadsCount - 1) ? totalTasks : startTaskIndex + tasksPerThread;
-        
-                for (int j = startTaskIndex; j < endTaskIndex; ++j) 
-                {
-                    int rowIndex = j / matrix1.columns;
-                    int columnIndex = j % matrix2.columns;
-        
-                    int[] row = matrix1.getRow(rowIndex);
-                    int[] column = matrix2.getColumn(columnIndex);
-        
-                    int result = 0;
-    
-                    for (int k = 0; k < row.length; ++k) 
-                    {
-                        result += row[k] * column[k];
-                    }
-        
-                    resultingMatrix.set(rowIndex, columnIndex, result);
-                }
-            });
-        }
-        
-        for (Thread thread : threads) 
-        {
-            thread.start();
-        }
-        
-        for (Thread thread : threads) 
-        {
-            try
-            {
-                thread.join();
-            }
-            catch (InterruptedException e)
-            {
-                e.printStackTrace();
-            }
-        }
-    
-        long timestepEnd = System.currentTimeMillis();
-    
-        long executionTime = timestepEnd - timestepStart;
-    
-        Result result = new Result(resultingMatrix, executionTime);
-    
-        return result;
-    } 
-
     public static Result multiplyFox(MatrixInt matrix1, MatrixInt matrix2, int threadsCount)
     {
         if (!MatrixInt.areMultipliable(matrix1, matrix2))
         {
             throw new IllegalArgumentException("Matrices are not multipliable.");
         }
-    
-        int size = matrix1.getRows();
-        int blockSize = size / threadsCount;
-        MatrixInt resultingMatrix = new MatrixInt(size, size);
-    
-        long timestepStart = System.currentTimeMillis();
-    
-        Thread[] threads = new Thread[threadsCount * threadsCount];
-    
-        for (int threadRow = 0; threadRow < threadsCount; ++threadRow)
+
+        if (threadsCount < 0 || (threadsCount & (threadsCount - 1)) != 0)
         {
-            for (int threadColumn = 0; threadColumn < threadsCount; ++threadColumn)
+            throw new IllegalArgumentException("threadsCount is not power of 2.");
+        }
+
+        MatrixInt resultingMatrix = new MatrixInt(matrix1.rows, matrix2.columns);
+
+        long timestepStart = System.currentTimeMillis();
+
+        int threadPayload = (int) (matrix1.rows / Math.sqrt(threadsCount));
+
+        int threadIndex = 0;
+        Thread[] threads = new Thread[threadsCount];
+    
+        for (int rowIndex = 0; rowIndex < matrix1.rows; rowIndex += threadPayload)
+        {
+            for (int columnIndex = 0; columnIndex < matrix2.columns; columnIndex += threadPayload)
             {
-                final int THREAD_ROW = threadRow;
-                final int THREAD_COLUMN = threadColumn;
-    
-                threads[threadRow * threadsCount + threadColumn] = new Thread(() ->
+                final int ROW_INDEX = rowIndex;
+                final int COLUMN_INDEX = columnIndex;
+
+                threads[threadIndex++] = new Thread(() -> 
                 {
-                    for (int k = 0; k < threadsCount; ++k)
+                    int matrix1RowSize =  (ROW_INDEX + threadPayload) > matrix1.rows ? (matrix1.rows - ROW_INDEX) : threadPayload;
+                    int matrix2ColumnSize = (COLUMN_INDEX + threadPayload) > matrix2.columns ? (matrix2.columns - COLUMN_INDEX) : threadPayload;
+
+                    for (int i = 0; i < matrix1.rows; i += threadPayload)
                     {
-                        int kk = (k + THREAD_ROW) % threadsCount;
-    
-                        for (int i = THREAD_ROW * blockSize; i < (THREAD_ROW + 1) * blockSize; ++i)
+                        int matrix2RowSize = (i + threadPayload) > matrix2.rows ? (matrix2.rows - i) : threadPayload;
+                        int matrix1ColumnSize = (i + threadPayload) > matrix1.columns ? (matrix1.columns - i) : threadPayload;
+
+                        MatrixInt block1 = copyMatrixIntBlock(matrix1, ROW_INDEX, ROW_INDEX + matrix1RowSize, i, i + matrix1ColumnSize);
+                        MatrixInt block2 = copyMatrixIntBlock(matrix2, i, i + matrix2RowSize, COLUMN_INDEX, COLUMN_INDEX + matrix2ColumnSize);
+
+                        MatrixInt resultingBlock = MatrixInt.multiplySequential(block1, block2).getMatrixInt();
+
+                        for (int j = 0; j < resultingBlock.rows; ++j)
                         {
-                            for (int j = THREAD_COLUMN * blockSize; j < (THREAD_COLUMN + 1) * blockSize; ++j)
+                            for (int k = 0; k < resultingBlock.columns; ++k)
                             {
-                                for (int kkBlock = kk * blockSize; kkBlock < (kk + 1) * blockSize; ++kkBlock)
-                                {
-                                    resultingMatrix.matrix[i][j] += matrix1.matrix[i][kkBlock] * matrix2.matrix[kkBlock][j];
-                                }
+                                resultingMatrix.set(j + ROW_INDEX, k + COLUMN_INDEX, resultingBlock.get(j, k) + resultingMatrix.get(j + ROW_INDEX, k + COLUMN_INDEX));
                             }
                         }
                     }
                 });
             }
         }
-    
+
         for (Thread thread : threads)
         {
             thread.start();
         }
-    
+        
         for (Thread thread : threads)
         {
             try
@@ -303,15 +244,104 @@ public final class MatrixInt
                 e.printStackTrace();
             }
         }
-    
+
         long timestepEnd = System.currentTimeMillis();
-    
+
         long executionTime = timestepEnd - timestepStart;
-    
+
         Result result = new Result(resultingMatrix, executionTime);
-    
+
         return result;
-    }    
+    }
+
+    private static MatrixInt copyMatrixIntBlock(MatrixInt source, int rowStart, int rowFinish, int columnStart, int columnFinish)
+    {
+        final int OFFSET_ROW = rowFinish - rowStart;
+        final int OFFSET_COLUMN = columnFinish - columnStart;
+
+        MatrixInt matrix = new MatrixInt(rowFinish - rowStart, columnFinish - columnStart);
+
+        for (int i = 0; i < OFFSET_ROW; ++i)
+        {
+            for (int j = 0; j < OFFSET_COLUMN; ++j)
+            {
+                matrix.set(i, j, source.get(i + rowStart, j + columnStart));
+            }
+        }
+
+        return matrix;
+    }
+
+    public static Result multiplyStriped(MatrixInt matrix1, MatrixInt matrix2, int threadsCount)
+    {
+        if (!MatrixInt.areMultipliable(matrix1, matrix2))
+        {
+            throw new IllegalArgumentException("Matrices are not multipliable.");
+        }
+
+        MatrixInt resultingMatrix = new MatrixInt(matrix1.rows, matrix2.columns);
+
+        long timestepStart = System.currentTimeMillis();
+
+        int totalTasks = matrix1.rows * matrix2.columns;
+        int tasksPerThread = totalTasks / threadsCount;
+
+        Thread[] threads = new Thread[threadsCount];
+
+        for (int i = 0; i < threadsCount; ++i)
+        {
+            final int THREAD_ID = i;
+
+            threads[i] = new Thread(() -> 
+            {
+                int startTaskIndex = THREAD_ID * tasksPerThread;
+                int endTaskIndex = (THREAD_ID == threadsCount - 1) ? totalTasks : startTaskIndex + tasksPerThread;
+
+                for (int j = startTaskIndex; j < endTaskIndex; ++j)
+                {
+                    int rowIndex = j / matrix1.columns;
+                    int columnIndex = j % matrix2.columns;
+
+                    int[] row = matrix1.getRow(rowIndex);
+                    int[] column = matrix2.getColumn(columnIndex);
+
+                    int result = 0;
+
+                    for (int k = 0; k < row.length; ++k)
+                    {
+                        result += row[k] * column[k];
+                    }
+
+                    resultingMatrix.set(rowIndex, columnIndex, result);
+                }
+            });
+        }
+
+        for (Thread thread : threads) 
+        {
+            thread.start();
+        }
+
+        for (Thread thread : threads) 
+        {
+            try
+            {
+                thread.join();
+            }
+            catch (InterruptedException e)
+            {
+                e.printStackTrace();
+            }
+        }
+
+        long timestepEnd = System.currentTimeMillis();
+
+        long executionTime = timestepEnd - timestepStart;
+
+        Result result = new Result(resultingMatrix, executionTime);
+
+        return result;
+    }
 
     private static boolean areMultipliable(MatrixInt matrix1, MatrixInt matrix2)
     {
