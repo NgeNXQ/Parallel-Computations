@@ -180,7 +180,9 @@ public final class MatrixInt
             throw new IllegalArgumentException("Matrices are not multipliable.");
         }
 
-        if (threadsCount < 0 || (threadsCount & (threadsCount - 1)) != 0)
+        int threadsPerBlock = (int) Math.sqrt(threadsCount);
+
+        if (threadsPerBlock * threadsPerBlock != threadsCount)
         {
             throw new IllegalArgumentException("threadsCount is not power of 2.");
         }
@@ -189,7 +191,7 @@ public final class MatrixInt
 
         long timestepStart = System.currentTimeMillis();
 
-        int threadPayload = (int) (matrix1.rows / Math.sqrt(threadsCount));
+        int threadPayload = (int) Math.ceil((double) matrix1.rows / threadsPerBlock);
 
         int threadIndex = 0;
         Thread[] threads = new Thread[threadsCount];

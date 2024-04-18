@@ -13,7 +13,7 @@ public class Main
         MatrixInt matrix1;
         MatrixInt matrix2;
 
-        int[] threads = {2, 4, 9};
+        int[] threads = {4, 9, 16};
         int[] dimensions = {500, 1000, 1500, 2000, 2500, 3000};
 
         for (int thread : threads)
