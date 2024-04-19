@@ -9,7 +9,8 @@ public class Main
         final int MIN_VALUE = 0;
         final int MAX_VALUE = 1000;
 
-        Result result;
+        Result result1;
+        Result result2;
         MatrixInt matrix1;
         MatrixInt matrix2;
 
@@ -28,9 +29,12 @@ public class Main
                 matrix1.fill(MIN_VALUE, MAX_VALUE);
                 matrix2.fill(MIN_VALUE, MAX_VALUE);
 
-                result = MatrixInt.multiplyFox(matrix1, matrix2, thread);
+                result1 = MatrixInt.multiplySequential(matrix1, matrix2);
+                result2 = MatrixInt.multiplyFox(matrix1, matrix2, thread);
 
-                result.printResults();
+                result2.printResults();
+
+                System.out.println(MatrixInt.AreEqual(result1.getMatrixInt(), result2.getMatrixInt()));
             }
         }
     }
