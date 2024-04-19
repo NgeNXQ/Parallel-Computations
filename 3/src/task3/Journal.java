@@ -8,7 +8,6 @@ import java.util.Comparator;
 import java.util.stream.IntStream;
 import java.util.stream.Collectors;
 
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 final class Journal
@@ -23,8 +22,8 @@ final class Journal
 
     private final int WEEKS_COUNT;
 
-    private final ConcurrentHashMap<Student, ReentrantLock[]> SHEET_LOCKS;
-    private final HashMap<Group, ConcurrentHashMap<Student, Integer[]>> SHEET;
+    private final HashMap<Student, ReentrantLock[]> SHEET_LOCKS;
+    private final HashMap<Group, HashMap<Student, Integer[]>> SHEET;
 
     public Journal(String name, int weeksCount, Group... groups)
     {
@@ -35,14 +34,14 @@ final class Journal
         this.WEEKS_COUNT = weeksCount;
 
         this.SHEET = new HashMap<>();
-        this.SHEET_LOCKS = new ConcurrentHashMap<>();
+        this.SHEET_LOCKS = new HashMap<>();
 
         for (Group group : groups)
         {
             for (int i = 0; i < group.getStudentsCount(); ++i)
             {
                 this.SHEET_LOCKS.computeIfAbsent(group.getStudent(i), k -> IntStream.range(0, weeksCount).mapToObj(j -> new ReentrantLock()).toArray(ReentrantLock[]::new));
-                this.SHEET.computeIfAbsent(group, k -> new ConcurrentHashMap<>()).put(group.getStudent(i), IntStream.range(0, weeksCount).mapToObj(j -> 0).toArray(Integer[]::new));
+                this.SHEET.computeIfAbsent(group, k -> new HashMap<>()).put(group.getStudent(i), IntStream.range(0, weeksCount).mapToObj(j -> 0).toArray(Integer[]::new));
             }
         }
     }
