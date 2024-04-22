@@ -9,10 +9,10 @@ final class Main
 {
     public static void main(String[] args)
     {
-        final Document DOCUMENT_1 = Document.readFile("4/resources/1k.txt");
-        final Document DOCUMENT_2 = Document.readFile("4/resources/10k.txt");
-        final Document DOCUMENT_3 = Document.readFile("4/resources/100k.txt");
-        final Document DOCUMENT_4 = Document.readFile("4/resources/hightech.txt");
+        final Document DOCUMENT_1 = Document.readFile("4/res/1k.txt");
+        final Document DOCUMENT_2 = Document.readFile("4/res/10k.txt");
+        final Document DOCUMENT_3 = Document.readFile("4/res/100k.txt");
+        final Document DOCUMENT_4 = Document.readFile("4/res/hightech.txt");
 
         final List<String> KEYWORDS = Arrays.asList("tech", "technology", "innovation", "sector", "industr", "web", "device", "startup", "service", "global");
 

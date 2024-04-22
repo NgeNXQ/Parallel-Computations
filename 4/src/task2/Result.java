@@ -2,26 +2,26 @@ package task2;
 
 public final class Result
 {
-    private MatrixInt matrix;
-    private long executionTime;
+    private final MatrixInt MATRIX;
+    private final long EXECUTION_TIME;
 
     public Result(MatrixInt matrix, long executionTime)
     {
-        this.matrix = matrix;
-        this.executionTime = executionTime;
+        this.MATRIX = matrix;
+        this.EXECUTION_TIME = executionTime;
     }
 
     public MatrixInt getMatrixInt()
     {
-        return this.matrix;
+        return this.MATRIX;
     }
 
     public void printResults()
     {
         final double MILLISECONDS_IN_SECOND = 1000.0;
 
-        double executionTimeSeconds = executionTime / MILLISECONDS_IN_SECOND;
+        double executionTimeSeconds = this.EXECUTION_TIME / MILLISECONDS_IN_SECOND;
 
-        System.out.println(String.format("Execution time: %.3f seconds, (%d milliseconds).", executionTimeSeconds, executionTime));
+        System.out.println(String.format("Execution time: %.3f seconds, (%d milliseconds).", executionTimeSeconds, this.EXECUTION_TIME));
     }
 }

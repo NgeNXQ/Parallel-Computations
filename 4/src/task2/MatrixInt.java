@@ -276,7 +276,7 @@ public final class MatrixInt
         return matrix;
     }
 
-    public static Result multiplyStripedWithActions(MatrixInt matrix1, MatrixInt matrix2, int threshold)
+    public static Result multiplyStripedWithActions(MatrixInt matrix1, MatrixInt matrix2)
     {
         if (!MatrixInt.areMultipliable(matrix1, matrix2))
         {
@@ -287,7 +287,7 @@ public final class MatrixInt
 
         long timestepStart = System.currentTimeMillis();
 
-        ForkJoinPool.commonPool().invoke(new StripedMultiplicationAction(matrix1, matrix2, resultingMatrix, 0, matrix1.rows * matrix2.columns, threshold));
+        ForkJoinPool.commonPool().invoke(new StripedMultiplicationTask(matrix1, matrix2, resultingMatrix, 0, matrix1.rows * matrix2.columns));
 
         long timestepEnd = System.currentTimeMillis();
         long executionTime = timestepEnd - timestepStart;

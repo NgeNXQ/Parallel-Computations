@@ -6,33 +6,44 @@ final class Main
 {
     public static void main(String[] args)
     {
-        final Document DOCUMENT_1 = Document.readFile("4/resources/1k.txt");
+        final int THRESHOLD_REDUCER = 8;
 
-        DocumentAnalyzer.printWordsStatsDefault(DOCUMENT_1);
+        final Document DOCUMENT_1 = Document.readFile("4/res/1k.txt");
 
-        System.out.print("\n");
+        TotalLengthTask.setThreshold(DOCUMENT_1.getWordsCount() / THRESHOLD_REDUCER);
+        TotalSquaresTask.setThreshold(DOCUMENT_1.getWordsCount() / THRESHOLD_REDUCER);
 
-        DocumentAnalyzer.printWordsStatsEnhanced(DOCUMENT_1);
-
-        System.out.print("\n");
-
-        final Document DOCUMENT_2 = Document.readFile("4/resources/10k.txt");
-
-        DocumentAnalyzer.printWordsStatsDefault(DOCUMENT_2);
+        DocumentAnalyzer.getWordsStatsDefault(DOCUMENT_1).printResults();
 
         System.out.print("\n");
 
-        DocumentAnalyzer.printWordsStatsEnhanced(DOCUMENT_2);
+        DocumentAnalyzer.getWordsStatsEnhanced(DOCUMENT_1).printResults();
 
         System.out.print("\n");
 
-        final Document DOCUMENT_3 = Document.readFile("4/resources/100k.txt");
+        final Document DOCUMENT_2 = Document.readFile("4/res/10k.txt");
 
-        DocumentAnalyzer.printWordsStatsDefault(DOCUMENT_3);
+        TotalLengthTask.setThreshold(DOCUMENT_2.getWordsCount() / THRESHOLD_REDUCER);
+        TotalSquaresTask.setThreshold(DOCUMENT_2.getWordsCount() / THRESHOLD_REDUCER);
+
+        DocumentAnalyzer.getWordsStatsDefault(DOCUMENT_2).printResults();
 
         System.out.print("\n");
 
-        DocumentAnalyzer.printWordsStatsEnhanced(DOCUMENT_3);
+        DocumentAnalyzer.getWordsStatsEnhanced(DOCUMENT_2).printResults();
+
+        System.out.print("\n");
+
+        final Document DOCUMENT_3 = Document.readFile("4/res/100k.txt");
+
+        TotalLengthTask.setThreshold(DOCUMENT_3.getWordsCount() / THRESHOLD_REDUCER);
+        TotalSquaresTask.setThreshold(DOCUMENT_3.getWordsCount() / THRESHOLD_REDUCER);
+
+        DocumentAnalyzer.getWordsStatsDefault(DOCUMENT_3).printResults();
+
+        System.out.print("\n");
+
+        DocumentAnalyzer.getWordsStatsEnhanced(DOCUMENT_3).printResults();
 
         System.out.print("\n");
     }

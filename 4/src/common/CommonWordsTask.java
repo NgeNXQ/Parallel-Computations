@@ -28,7 +28,7 @@ final class CommonWordsTask extends RecursiveTask<HashMap<String, Integer>>
     {
         HashMap<String, Integer> documentWords = new HashMap<>();
 
-        if (this.INDEX_FINISH - this.INDEX_START < CommonWordsTask.Threshold)
+        if ((this.INDEX_FINISH - this.INDEX_START) < CommonWordsTask.Threshold)
         {
             List<String> words = this.DOCUMENT.getWordsSlice(this.INDEX_START, this.INDEX_FINISH);
 

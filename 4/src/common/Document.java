@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
 
+import java.util.regex.Pattern;
+
 public final class Document 
 {
     private final String FILENAME;
@@ -20,9 +22,11 @@ public final class Document
         this.LINES = lines;
         this.WORDS = new ArrayList<>();
 
+        final Pattern PATTERN = Pattern.compile("[\\s\\p{Punct}]+");
+
         for (String line : lines)
         {
-            WORDS.addAll(Arrays.asList(line.split("\\s+")));
+            this.WORDS.addAll(Arrays.asList(PATTERN.split(line)));
         }
     }
 
@@ -53,9 +57,9 @@ public final class Document
 
     public String getLine(int index)
     {
-        if (index < 0 && index > this.LINES.size())
+        if (index < 0 || index > this.LINES.size())
         {
-            throw new IndexOutOfBoundsException("Index is out of bounds");
+            throw new IllegalArgumentException("Index is out of bounds");
         }
 
         return this.LINES.get(index);
@@ -63,9 +67,9 @@ public final class Document
 
     public String getWord(int index)
     {
-        if (index < 0 && index > this.LINES.size())
+        if (index < 0 || index > this.LINES.size())
         {
-            throw new IndexOutOfBoundsException("Index is out of bounds");
+            throw new IllegalArgumentException("Index is out of bounds");
         }
 
         return this.WORDS.get(index);
@@ -73,19 +77,19 @@ public final class Document
 
     public List<String> getLinesSlice(int startIndex, int endIndex)
     {
-        if (startIndex < 0 && startIndex > this.LINES.size())
+        if (startIndex < 0 || startIndex > this.LINES.size())
         {
-            throw new IndexOutOfBoundsException("startIndex is out of bounds");
+            throw new IllegalArgumentException("startIndex is out of bounds");
         }
 
-        if (endIndex < 0 && endIndex > this.LINES.size())
+        if (endIndex < 0 || endIndex > this.LINES.size())
         {
-            throw new IndexOutOfBoundsException("endIndex is out of bounds");
+            throw new IllegalArgumentException("endIndex is out of bounds");
         }
 
         if (startIndex > endIndex)
         {
-            throw new IndexOutOfBoundsException("startIndex must be smaller than endIndex");
+            throw new IllegalArgumentException("startIndex must be smaller than endIndex");
         }
 
         return this.LINES.subList(startIndex, endIndex);
@@ -93,19 +97,19 @@ public final class Document
 
     public List<String> getWordsSlice(int startIndex, int endIndex)
     {
-        if (startIndex < 0 && startIndex > this.WORDS.size())
+        if (startIndex < 0 || startIndex > this.WORDS.size())
         {
-            throw new IndexOutOfBoundsException("startIndex is out of bounds");
+            throw new IllegalArgumentException("startIndex is out of bounds");
         }
 
-        if (endIndex < 0 && endIndex > this.WORDS.size())
+        if (endIndex < 0 || endIndex > this.WORDS.size())
         {
-            throw new IndexOutOfBoundsException("endIndex is out of bounds");
+            throw new IllegalArgumentException("endIndex is out of bounds");
         }
 
         if (startIndex > endIndex)
         {
-            throw new IndexOutOfBoundsException("startIndex must be smaller than endIndex");
+            throw new IllegalArgumentException("startIndex must be smaller than endIndex");
         }
 
         return this.WORDS.subList(startIndex, endIndex);

@@ -1,24 +1,25 @@
 package task2;
 
+import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
 
-public class StripedMultiplicationAction extends RecursiveAction
+public class StripedMultiplicationTask extends RecursiveAction
 {
+    private static int Threshold = 100;
+
     private final MatrixInt MATRIX_1;
     private final MatrixInt MATRIX_2;
     private final MatrixInt MATRIX_RESULT;
 
-    private final int THRESHOLD;
     private final int INDEX_START;
     private final int INDEX_FINISH;
 
-    public StripedMultiplicationAction(MatrixInt matrix1, MatrixInt matrix2, MatrixInt result, int indexStart, int indexFinish, int threshold)
+    public StripedMultiplicationTask(MatrixInt matrix1, MatrixInt matrix2, MatrixInt result, int indexStart, int indexFinish)
     {
         this.MATRIX_1 = matrix1;
         this.MATRIX_2 = matrix2;
         this.MATRIX_RESULT = result;
 
-        this.THRESHOLD = threshold;
         this.INDEX_START = indexStart;
         this.INDEX_FINISH = indexFinish;
     }
@@ -26,7 +27,7 @@ public class StripedMultiplicationAction extends RecursiveAction
     @Override
     protected void compute()
     {
-        if (this.INDEX_FINISH - this.INDEX_START <= this.THRESHOLD)
+        if (this.INDEX_FINISH - this.INDEX_START <= StripedMultiplicationTask.Threshold)
         {
             for (int i = this.INDEX_START; i < this.INDEX_FINISH; ++i)
             {
@@ -50,10 +51,20 @@ public class StripedMultiplicationAction extends RecursiveAction
         {
             final int INDEX_MID = (this.INDEX_START + this.INDEX_FINISH) / 2;
 
-            StripedMultiplicationAction leftTask = new StripedMultiplicationAction(this.MATRIX_1, this.MATRIX_2, this.MATRIX_RESULT, this.INDEX_START, INDEX_MID, this.THRESHOLD);
-            StripedMultiplicationAction rightTask = new StripedMultiplicationAction(this.MATRIX_1, this.MATRIX_2, this.MATRIX_RESULT, INDEX_MID, this.INDEX_FINISH, this.THRESHOLD);
+            StripedMultiplicationTask leftTask = new StripedMultiplicationTask(this.MATRIX_1, this.MATRIX_2, this.MATRIX_RESULT, this.INDEX_START, INDEX_MID);
+            StripedMultiplicationTask rightTask = new StripedMultiplicationTask(this.MATRIX_1, this.MATRIX_2, this.MATRIX_RESULT, INDEX_MID, this.INDEX_FINISH);
 
-            invokeAll(leftTask, rightTask);
+            ForkJoinTask.invokeAll(leftTask, rightTask);
         }
+    }
+
+    public static int getThreshold()
+    {
+        return StripedMultiplicationTask.Threshold;
+    }
+
+    public static void setThreshold(int value)
+    {
+        StripedMultiplicationTask.Threshold = value;
     }
 }

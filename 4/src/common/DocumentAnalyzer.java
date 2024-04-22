@@ -3,11 +3,12 @@ package common;
 import java.util.List;
 import java.util.HashMap;
 import java.util.ArrayList;
+
 import java.util.concurrent.ForkJoinPool;
 
-final public class DocumentAnalyzer
+public final class DocumentAnalyzer
 {
-    public static void printWordsStatsDefault(Document document)
+    public static WordsStats getWordsStatsDefault(Document document)
     {
         if (document == null)
         {
@@ -23,7 +24,7 @@ final public class DocumentAnalyzer
             totalLength += word.length();
         }
 
-        final double AVERAGE_WORD_LENGTH = (double) totalLength / document.getWordsCount();
+        final double AVERAGE_WORD_LENGTH = (double)totalLength / document.getWordsCount();
 
         double totalSquares = 0;
 
@@ -32,21 +33,20 @@ final public class DocumentAnalyzer
             totalSquares += Math.pow(word.length() - AVERAGE_WORD_LENGTH, 2);
         }
 
-        final double VARIANCE = totalSquares / document.getWordsCount();
-        final double STANDARD_DEVIATION = Math.sqrt(VARIANCE);
+        final double STANDARD_DEVIATION = Math.sqrt(totalSquares / document.getWordsCount());
         final double DISPERSION = STANDARD_DEVIATION / AVERAGE_WORD_LENGTH;
 
-        WordsStats stats = new WordsStats(document.getWordsCount(), VARIANCE, DISPERSION, STANDARD_DEVIATION, AVERAGE_WORD_LENGTH);
+        WordsStats stats = new WordsStats(document.getWordsCount(), DISPERSION, STANDARD_DEVIATION, AVERAGE_WORD_LENGTH);
 
         long timestepEnd = System.currentTimeMillis();
         long executionTime = timestepEnd - timestepStart;
 
-        stats.printResults();
-
         System.out.println(String.format("Execution time: %d ms", executionTime));
+
+        return stats;
     }
 
-    public static void printWordsStatsEnhanced(Document document)
+    public static WordsStats getWordsStatsEnhanced(Document document)
     {
         if (document == null)
         {
@@ -55,14 +55,23 @@ final public class DocumentAnalyzer
 
         long timestepStart = System.currentTimeMillis();
 
-        WordsStats stats = ForkJoinPool.commonPool().invoke(new WordsStatsTask(document, 0, document.getWordsCount()));
+        final int TOTAL_LENGTH = ForkJoinPool.commonPool().invoke(new TotalLengthTask(document, 0, document.getWordsCount()));
+
+        final double AVERAGE_WORD_LENGTH = (double)TOTAL_LENGTH / document.getWordsCount();
+
+        final double TOTAL_SQUARES = ForkJoinPool.commonPool().invoke(new TotalSquaresTask(AVERAGE_WORD_LENGTH, document, 0, document.getWordsCount()));
+
+        final double STANDARD_DEVIATION = Math.sqrt(TOTAL_SQUARES / document.getWordsCount());
+        final double DISPERSION = STANDARD_DEVIATION / AVERAGE_WORD_LENGTH;
 
         long timestepEnd = System.currentTimeMillis();
         long executionTime = timestepEnd - timestepStart;
 
-        stats.printResults();
+        WordsStats stats = new WordsStats(document.getWordsCount(), DISPERSION, STANDARD_DEVIATION, AVERAGE_WORD_LENGTH);
 
         System.out.println(String.format("Execution time: %d ms", executionTime));
+
+        return stats;
     }
 
     public static HashMap<String, Integer> getCommonWords(Document... documents)
@@ -79,12 +88,17 @@ final public class DocumentAnalyzer
             }
             else
             {
-                commonWords.keySet().retainAll(documentWords.keySet());
+                HashMap<String, Integer> newCommonWords = new HashMap<>();
 
                 for (String word : commonWords.keySet())
                 {
-                    commonWords.put(word, commonWords.get(word) + documentWords.get(word));
+                    if (documentWords.containsKey(word))
+                    {
+                        newCommonWords.put(word, commonWords.get(word) + documentWords.get(word));
+                    }
                 }
+
+                commonWords = newCommonWords;
             }
         }
 

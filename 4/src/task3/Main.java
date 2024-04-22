@@ -9,11 +9,11 @@ final class Main
 {
     public static void main(String[] args)
     {
-        final Document DOCUMNET_1K = Document.readFile("4/resources/1k.txt");
-        final Document DOCUMNET_10K = Document.readFile("4/resources/10k.txt");
-        final Document DOCUMNET_100K = Document.readFile("4/resources/100k.txt");
+        final Document DOCUMENT_1 = Document.readFile("4/res/1k.txt");
+        final Document DOCUMENT_2 = Document.readFile("4/res/10k.txt");
+        final Document DOCUMENT_3 = Document.readFile("4/res/100k.txt");
 
-        HashMap<String, Integer> commonWords = DocumentAnalyzer.getCommonWords(DOCUMNET_1K, DOCUMNET_10K, DOCUMNET_100K);
+        HashMap<String, Integer> commonWords = DocumentAnalyzer.getCommonWords(DOCUMENT_1, DOCUMENT_2, DOCUMENT_3);
 
         for (Map.Entry<String, Integer> entry : commonWords.entrySet())
         {

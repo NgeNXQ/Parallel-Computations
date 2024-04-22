@@ -7,7 +7,7 @@ final class Main
         final int MIN_VALUE = 0;
         final int MAX_VALUE = 1000;
 
-        final int THRESHOLD_REDUCER = 2;
+        final int THRESHOLD_REDUCER = 8;
 
         Result result1;
         Result result2;
@@ -22,6 +22,7 @@ final class Main
             for (final int DIMENSION : DIMENSIONS)
             {
                 final int THRESHOLD = DIMENSION / THRESHOLD_REDUCER;
+                StripedMultiplicationTask.setThreshold(THRESHOLD);
 
                 matrix1 = new MatrixInt(DIMENSION, DIMENSION);
                 matrix2 = new MatrixInt(DIMENSION, DIMENSION);
@@ -29,13 +30,14 @@ final class Main
                 matrix1.fill(MIN_VALUE, MAX_VALUE);
                 matrix2.fill(MIN_VALUE, MAX_VALUE);
 
-                result1 = MatrixInt.multiplyStripedWithThreads(matrix1, matrix2, THREAD);
-                result2 = MatrixInt.multiplyStripedWithActions(matrix1, matrix2, THRESHOLD);
+                result1 = MatrixInt.multiplyStripedWithActions(matrix1, matrix2);
+                result2 = MatrixInt.multiplyStripedWithThreads(matrix1, matrix2, THREAD);
 
                 result1.printResults();
                 result2.printResults();
 
                 System.out.print(String.format("Threads: %d; Dimensions: %d; Threshold: %d | ", THREAD, DIMENSION, THRESHOLD));
+
                 System.out.println(MatrixInt.AreEqual(result1.getMatrixInt(), result2.getMatrixInt()));
             }
         }

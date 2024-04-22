@@ -1,6 +1,7 @@
 package common;
 
 import java.util.List;
+
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveTask;
 
@@ -61,8 +62,6 @@ public class KeywordsSearchTask extends RecursiveTask<Boolean>
 
             return firstTask.join() || secondTask.join();
         }
-
-        //return this.KEYWORDS.stream().map(String::toLowerCase).anyMatch(keyword -> this.DOCUMENT.getWords().stream().map(String::toLowerCase).anyMatch(word -> word.contains(keyword)));
     }
 
     public static int getThreshold()
