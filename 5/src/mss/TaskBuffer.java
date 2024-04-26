@@ -1,6 +1,6 @@
 package mss;
 
-final class Buffer 
+public final class TaskBuffer
 {
     private Task value;
     private boolean isEmpty = true;

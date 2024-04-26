@@ -3,7 +3,7 @@ package mss;
 final class Task implements Runnable
 {
     private static final long DELAY_SIMULATION_MIN_MS = 1000;
-    private static final long DELAY_SIMULATION_MAX_MS = 10000;
+    private static final long DELAY_SIMULATION_MAX_MS = 5000;
 
     private static int nextId = 0;
 
@@ -28,7 +28,6 @@ final class Task implements Runnable
         }
         catch (InterruptedException exception)
         {
-            //Thread.currentThread().interrupt();
             System.out.println(exception.getStackTrace());
         }
     }
