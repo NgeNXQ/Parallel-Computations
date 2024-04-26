@@ -2,7 +2,6 @@ package common;
 
 import java.util.List;
 
-import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveTask;
 
 public class KeywordsSearchTask extends RecursiveTask<Boolean>
@@ -58,7 +57,8 @@ public class KeywordsSearchTask extends RecursiveTask<Boolean>
             KeywordsSearchTask firstTask = new KeywordsSearchTask(this.DOCUMENT, this.KEYWORDS, this.INDEX_START, INDEX_MID);
             KeywordsSearchTask secondTask = new KeywordsSearchTask(this.DOCUMENT, this.KEYWORDS, INDEX_MID, this.INDEX_FINISH);
 
-            ForkJoinTask.invokeAll(firstTask, secondTask);
+            firstTask.fork();
+            secondTask.fork();
 
             return firstTask.join() || secondTask.join();
         }

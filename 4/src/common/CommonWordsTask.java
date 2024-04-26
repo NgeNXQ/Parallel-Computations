@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.List;
 import java.util.HashMap;
 
-import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveTask;
 
 final class CommonWordsTask extends RecursiveTask<HashMap<String, Integer>>
@@ -44,7 +43,8 @@ final class CommonWordsTask extends RecursiveTask<HashMap<String, Integer>>
             CommonWordsTask firstTask = new CommonWordsTask(this.DOCUMENT, this.INDEX_START, INDEX_MID);
             CommonWordsTask secondTask = new CommonWordsTask(this.DOCUMENT, INDEX_MID, this.INDEX_FINISH);
 
-            ForkJoinTask.invokeAll(firstTask, secondTask);
+            firstTask.fork();
+            secondTask.fork();
 
             HashMap<String, Integer> firstResult = firstTask.join();
             HashMap<String, Integer> secondResult = secondTask.join();
