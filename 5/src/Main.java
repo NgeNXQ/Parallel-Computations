@@ -5,8 +5,8 @@ final class Main
     public static void main(String[] args)
     {
         final int BUFFER_SIZE = 1000;
-        final int MODEL_CHANNELS_COUNT = 3;
-        final int MODEL_MAX_QUEUE_LENGTH = 5;
+        final int MODEL_CHANNELS_COUNT = 5;
+        final int MODEL_MAX_QUEUE_LENGTH = 10;
 
         final TaskBuffer TASK_BUFFER_1 = new TaskBuffer();
         final TaskBuffer TASK_BUFFER_2 = new TaskBuffer();
