@@ -2,63 +2,61 @@ package mss;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.Executors;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ScheduledExecutorService;
 
-public final class Logger extends Thread
+public final class Logger
 {
+    private static final Logger INSTANCE = new Logger();
+
     private static final long SCHEDULER_PERIOD = 10;
 
-    private static Logger instance = null;
-
-    private final BlockingQueue<String> MESSAGES_BUFFER;
     private final ScheduledExecutorService MESSAGES_SCHEDULER;
+    private final ConcurrentHashMap<Thread, LinkedBlockingDeque<String>> MESSAGES_BUFFERS;
 
     private Logger()
     {
-        this.MESSAGES_BUFFER = new LinkedBlockingQueue<>();
+        this.MESSAGES_BUFFERS = new ConcurrentHashMap<>();
         this.MESSAGES_SCHEDULER = Executors.newScheduledThreadPool(1);
     }
 
-    public static synchronized Logger getInstance()
+    public static Logger getInstance()
     {
-        if (Logger.instance == null)
-        {
-            Logger.instance = new Logger();
-        }
-
-        return Logger.instance;
+        return Logger.INSTANCE;
     }
 
-    @Override
-    public void run()
+    public synchronized void start()
     {
+        this.MESSAGES_BUFFERS.clear();
         this.MESSAGES_SCHEDULER.scheduleAtFixedRate(() -> 
         {
-            String message = MESSAGES_BUFFER.poll();
-
-            if (message != null)
+            for (final Thread THREAD : this.MESSAGES_BUFFERS.keySet())
             {
-                System.out.println(message);
-            }
+                final String MESSAGE = MESSAGES_BUFFERS.get(THREAD).pollLast();
 
+                if (MESSAGE != null)
+                {
+                    System.out.println(MESSAGE);
+                    this.MESSAGES_BUFFERS.get(THREAD).clear();
+                }
+            }
         }, 0, Logger.SCHEDULER_PERIOD, TimeUnit.SECONDS);
     }
 
-    public void logMessageScheduled(String message)
-    {
-        this.MESSAGES_BUFFER.offer(message);
-    }
-
-    public void logMessageInstant(String message)
+    public synchronized void logMessageInstant(String message)
     {
         System.out.println(message);
     }
 
-    public void shutdown()
+    public synchronized void logMessageScheduled(Thread thread, String message)
     {
-        this.MESSAGES_BUFFER.clear();
+        this.MESSAGES_BUFFERS.computeIfAbsent(thread, k -> new LinkedBlockingDeque<>()).offer(message);
+    }
+
+    public synchronized void shutdown()
+    {
+        this.MESSAGES_BUFFERS.clear();
         this.MESSAGES_SCHEDULER.shutdown();
     }
 }

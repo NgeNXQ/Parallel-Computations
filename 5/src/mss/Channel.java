@@ -8,13 +8,15 @@ final class Channel
     private static int nextId = 0;
 
     private final int ID;
+    private final int MODEL_ID;
     private final ExecutorService EXECUTOR;
 
     private boolean isBusy;
 
-    public Channel()
+    public Channel(int modelId)
     {
         this.isBusy = false;
+        this.MODEL_ID = modelId;
         this.ID = ++Channel.nextId;
         this.EXECUTOR = Executors.newSingleThreadExecutor();
     }
@@ -24,7 +26,12 @@ final class Channel
         return this.ID;
     }
 
-    public synchronized boolean getIsBusy()
+    public int getModelId()
+    {
+        return this.MODEL_ID;
+    }
+
+    public boolean getIsBusy()
     {
         return this.isBusy;
     }
@@ -34,12 +41,12 @@ final class Channel
         this.EXECUTOR.execute(() -> 
         {
             this.isBusy = true;
-            Logger.getInstance().logMessageInstant(String.format("Task #%d is in process on Channel #%d.", task.getId(), this.ID));
-    
+            Logger.getInstance().logMessageInstant(String.format("MODEL #%d LOG | TASK #%d is in process on Channel #%d.", this.MODEL_ID, task.getId(), this.ID));
+
             task.run();
-    
+
             this.isBusy = false;
-            Logger.getInstance().logMessageInstant(String.format("Task #%d is finished on Channel #%d.", task.getId(), this.ID));
+            Logger.getInstance().logMessageInstant(String.format("MODEL #%d LOG | TASK #%d is finished on Channel #%d.", this.MODEL_ID, task.getId(), this.ID));
         });
     }
 
