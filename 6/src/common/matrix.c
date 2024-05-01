@@ -14,7 +14,7 @@ typedef struct InternalMatrixInt
 {
     int rows;
     int columns;
-    int** matrix;
+    int **data;
 } MatrixInt;
 
 #pragma region init & free
@@ -29,10 +29,10 @@ void matrix_int_free(MatrixInt const *matrix)
 
     for (int i = 0; i < matrix->rows; ++i)
     {
-        free(matrix->matrix[i]);
+        free(matrix->data[i]);
     }
 
-    free(matrix->matrix);
+    free(matrix->data);
     free(matrix);
 }
 
@@ -50,7 +50,7 @@ MatrixInt* matrix_int_init(const int rows, const int columns)
         return NULL;
     }
 
-    MatrixInt* const matrix = (MatrixInt*)malloc(sizeof(MatrixInt));
+    MatrixInt *matrix = (MatrixInt*)malloc(sizeof(MatrixInt));
 
     if (matrix == NULL)
     {
@@ -60,11 +60,11 @@ MatrixInt* matrix_int_init(const int rows, const int columns)
 
     matrix->rows = rows;
     matrix->columns = columns;
-    matrix->matrix = (int**)malloc(rows * sizeof(int*));
+    matrix->data = (int**)malloc(rows * sizeof(int*));
 
-    if (matrix->matrix == NULL)
+    if (matrix->data == NULL)
     {
-        free(matrix->matrix);
+        free(matrix->data);
         free(matrix);
         perror("Failed to allocate memory for MatrixInt");
         return NULL;
@@ -72,9 +72,9 @@ MatrixInt* matrix_int_init(const int rows, const int columns)
 
     for (int i = 0; i < rows; ++i)
     {
-        matrix->matrix[i] = (int*)malloc(columns * sizeof(int));
+        matrix->data[i] = (int*)malloc(columns * sizeof(int));
 
-        if (matrix->matrix[i] == NULL)
+        if (matrix->data[i] == NULL)
         {
             matrix_int_free(matrix);
             perror("Failed to allocate memory for MatrixInt");
@@ -119,7 +119,7 @@ int** matrix_int_get_matrix(const MatrixInt const *matrix)
         return NULL;
     }
 
-    return matrix->matrix;
+    return matrix->data;
 }
 
 void matrix_int_set_matrix(MatrixInt *matrix, const int const **data)
@@ -140,7 +140,7 @@ void matrix_int_set_matrix(MatrixInt *matrix, const int const **data)
     {
         for (int j = 0; j < matrix->columns; ++j)
         {
-            matrix->matrix[i][j] = data[i][j];
+            matrix->data[i][j] = data[i][j];
         }
     }
 }
@@ -159,7 +159,7 @@ int* matrix_int_get_row(const MatrixInt const *matrix, const int index)
         return NULL;
     }
 
-    return matrix->matrix[index];
+    return matrix->data[index];
 }
 
 int* matrix_int_get_column(const MatrixInt const *matrix, const int index)
@@ -176,17 +176,18 @@ int* matrix_int_get_column(const MatrixInt const *matrix, const int index)
         return NULL;
     }
 
-    int* const column = (int*)malloc(matrix->rows * sizeof(int));
+    int *column = (int*)malloc(matrix->rows * sizeof(int));
 
     if (column == NULL)
     {
+        free(column);
         perror("Memory allocation failed");
         return NULL;
     }
 
     for (int i = 0; i < matrix->rows; ++i)
     {
-        column[i] = matrix->matrix[i][index];
+        column[i] = matrix->data[i][index];
     }
 
     return column;
@@ -206,7 +207,7 @@ int matrix_int_get(const MatrixInt const *matrix, const int row_index, const int
         return -1;
     }
 
-    return matrix->matrix[row_index][column_index];
+    return matrix->data[row_index][column_index];
 }
 
 void matrix_int_set(const MatrixInt const *matrix, const int row_index, const int column_index, const int value)
@@ -223,7 +224,7 @@ void matrix_int_set(const MatrixInt const *matrix, const int row_index, const in
         return;
     }
     
-    matrix->matrix[row_index][column_index] = value;
+    matrix->data[row_index][column_index] = value;
 }
 
 #pragma endregion
@@ -238,7 +239,7 @@ void matrix_int_fill_random(const MatrixInt const *matrix, const int min, const 
     {
         for (int j = 0; j < matrix->columns; ++j)
         {
-            matrix->matrix[i][j] = rand() % (max - min + 1) + min;
+            matrix->data[i][j] = rand() % (max - min + 1) + min;
         }
     }
 }
@@ -266,7 +267,7 @@ bool matrix_int_are_equal(const MatrixInt const *matrix1, const MatrixInt const 
     {
         for (int j = 0; j < matrix2->columns; ++j)
         {
-            if (matrix1->matrix[i][j] != matrix2->matrix[i][j])
+            if (matrix1->data[i][j] != matrix2->data[i][j])
             {
                 return false;
             }
@@ -280,7 +281,7 @@ bool matrix_int_are_equal(const MatrixInt const *matrix1, const MatrixInt const 
 
 #pragma region multiplication functions
 
-MatrixInt* matrix_int_multiply_sequential(const MatrixInt* const matrix1, const MatrixInt* const matrix2)
+MatrixInt* matrix_int_multiply_sequential(const MatrixInt const *matrix1, const MatrixInt const *matrix2)
 {
     if (matrix1->columns != matrix2->rows)
     {
@@ -288,32 +289,40 @@ MatrixInt* matrix_int_multiply_sequential(const MatrixInt* const matrix1, const 
         return NULL;
     }
 
-    MatrixInt *result = matrix_int_init(matrix1->rows, matrix2->columns);
+    const MatrixInt const *RESULT = matrix_int_init(matrix1->rows, matrix2->columns);
     
-    if (result == NULL)
+    if (RESULT == NULL)
     {
         return NULL;
     }
+
+    const clock_t TIMESTEP_START = clock();
+
+    int sum;
 
     for (int i = 0; i < matrix1->rows; ++i)
     {
         for (int j = 0; j < matrix2->columns; ++j)
         {
-            int sum = 0;
+            sum = 0;
 
             for (int k = 0; k < matrix1->columns; ++k)
             {
-                sum += matrix1->matrix[i][k] * matrix2->matrix[k][j];
+                sum += matrix1->data[i][k] * matrix2->data[k][j];
             }
 
-            result->matrix[i][j] = sum;
+            RESULT->data[i][j] = sum;
         }
     }
 
-    return result;
+    const clock_t TIMESTEP_FINISH = clock();
+
+    printf("matrix_int_multiply_sequential. Execution time: %.3f seconds.\n", (double)(TIMESTEP_FINISH - TIMESTEP_START) / CLOCKS_PER_SEC);
+
+    return RESULT;
 }
 
-MatrixInt* matrix_int_multiply_mpi_blocking(const MatrixInt* const matrix1, const MatrixInt* const matrix2)
+MatrixInt* matrix_int_multiply_mpi_blocking(const MatrixInt const *matrix1, const MatrixInt const *matrix2)
 {
     int mpi_comm_rank;
     int mpi_comm_size;
@@ -329,29 +338,33 @@ MatrixInt* matrix_int_multiply_mpi_blocking(const MatrixInt* const matrix1, cons
 
     if (mpi_comm_size < 2)
     {
-        printf("At least 2 MPI processors are required.\n");
+        perror("At least 2 MPI processors are required.");
         MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
         return NULL;
     }
 
-    int mpi_index_start;
-    int mpi_index_finish;
     MPI_Status mpi_status;
 
     int *mpi_stripe;
+    int mpi_index;
     int mpi_index_row;
+    int mpi_index_start;
+    int mpi_index_finish;
     int mpi_index_column;
 
-    const MatrixInt* const result = matrix_int_init(matrix1->rows, matrix2->columns);
+    const MatrixInt const *RESULT = matrix_int_init(matrix1->rows, matrix2->columns);
 
-    const clock_t CLOCK_START = clock();
+    if (RESULT == NULL)
+    {
+        return NULL;
+    }
 
     if (mpi_comm_rank == MPI_ROOT_RANK)
     {
+        const clock_t TIMESTEP_START = clock();
+
         const int TOTAL_TASKS = (matrix1->rows * matrix2->columns);
         const int WORKER_PAYLOAD = TOTAL_TASKS / mpi_comm_size;
-
-        int index;
 
         for (int i = 1; i < mpi_comm_size; ++i)
         {
@@ -364,12 +377,18 @@ MatrixInt* matrix_int_multiply_mpi_blocking(const MatrixInt* const matrix1, cons
 
         for (int i = 1; i < mpi_comm_size; ++i)
         {
-            index = 0;
-
-            MPI_Recv(&mpi_index_finish, 1, MPI_INT, i, MPI_TAG_WORKER_MESSAGE, MPI_COMM_WORLD, &mpi_status);
             MPI_Recv(&mpi_index_start, 1, MPI_INT, i, MPI_TAG_WORKER_MESSAGE, MPI_COMM_WORLD, &mpi_status);
+            MPI_Recv(&mpi_index_finish, 1, MPI_INT, i, MPI_TAG_WORKER_MESSAGE, MPI_COMM_WORLD, &mpi_status);
 
+            mpi_index = 0;
             mpi_stripe = (int*)malloc((mpi_index_finish - mpi_index_start) * sizeof(int));
+
+            if (mpi_stripe == NULL)
+            {
+                perror("matrix_int_multiply_mpi_blocking. Memory allocation failed.");
+                MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
+                return NULL;
+            }
 
             MPI_Recv(mpi_stripe, (mpi_index_finish - mpi_index_start), MPI_INT, i, MPI_TAG_WORKER_MESSAGE, MPI_COMM_WORLD, &mpi_status);
 
@@ -378,27 +397,31 @@ MatrixInt* matrix_int_multiply_mpi_blocking(const MatrixInt* const matrix1, cons
                 mpi_index_row = j / matrix1->columns;
                 mpi_index_column = j % matrix2->columns;
 
-                matrix_int_set(result, mpi_index_row, mpi_index_column, *(mpi_stripe + index++));
+                matrix_int_set(RESULT, mpi_index_row, mpi_index_column, *(mpi_stripe + mpi_index++));
             }
 
             free(mpi_stripe);
         }
+
+        const clock_t TIMESTEP_FINISH = clock();
+        
+        printf("matrix_int_multiply_mpi_blocking. Execution time: %.3f seconds.\n", (double)(TIMESTEP_FINISH - TIMESTEP_START) / CLOCKS_PER_SEC);
     }
     else
     {
         int sum;
-        int index = 0;
-        int* matrix_row;
-        int* matrix_column;
+        int *matrix_row;
+        int *matrix_column;
 
         MPI_Recv(&mpi_index_start, 1, MPI_INT, MPI_ROOT_RANK, MPI_TAG_ROOT_MESSAGE, MPI_COMM_WORLD, &mpi_status);
         MPI_Recv(&mpi_index_finish, 1, MPI_INT, MPI_ROOT_RANK, MPI_TAG_ROOT_MESSAGE, MPI_COMM_WORLD, &mpi_status);
 
+        mpi_index = 0;
         mpi_stripe = (int*)malloc((mpi_index_finish - mpi_index_start) * sizeof(int));
 
         if (mpi_stripe == NULL)
         {
-            perror("matrix_int_multiply_mpi_blocking. Memory allocation failed.\n");
+            perror("matrix_int_multiply_mpi_blocking. Memory allocation failed.");
             MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
             return NULL;
         }
@@ -418,47 +441,166 @@ MatrixInt* matrix_int_multiply_mpi_blocking(const MatrixInt* const matrix1, cons
                 sum += (*(matrix_row + j)) * (*(matrix_column + j));
             }
 
-            *(mpi_stripe + index++) = sum;
+            *(mpi_stripe + mpi_index++) = sum;
+
+            free(matrix_column);
         }
 
-        MPI_Send(&mpi_index_finish, 1, MPI_INT, MPI_ROOT_RANK, MPI_TAG_WORKER_MESSAGE, MPI_COMM_WORLD);
         MPI_Send(&mpi_index_start, 1, MPI_INT, MPI_ROOT_RANK, MPI_TAG_WORKER_MESSAGE, MPI_COMM_WORLD);
-        MPI_Send(mpi_stripe, index, MPI_INT, MPI_ROOT_RANK, MPI_TAG_WORKER_MESSAGE, MPI_COMM_WORLD);
+        MPI_Send(&mpi_index_finish, 1, MPI_INT, MPI_ROOT_RANK, MPI_TAG_WORKER_MESSAGE, MPI_COMM_WORLD);
+        MPI_Send(mpi_stripe, mpi_index, MPI_INT, MPI_ROOT_RANK, MPI_TAG_WORKER_MESSAGE, MPI_COMM_WORLD);
 
         free(mpi_stripe);
     }
 
-    for (int i = 0; i < result->rows; ++i)
+    return RESULT;
+}
+
+MatrixInt* matrix_int_multiply_mpi_non_blocking(const MatrixInt const *matrix1, const MatrixInt const *matrix2)
+{
+    int mpi_comm_rank;
+    int mpi_comm_size;
+
+    MPI_Comm_rank(MPI_COMM_WORLD, &mpi_comm_rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &mpi_comm_size);
+
+    if (matrix1->columns != matrix2->rows)
     {
-        MPI_Bcast(matrix_int_get_row(result, i), matrix_int_get_columns_count(result), MPI_INT, MPI_ROOT_RANK, MPI_COMM_WORLD);
+        perror("Matrices are not multipliable.");
+        return NULL;
     }
 
-    const clock_t CLOCK_FINISH = clock();
+    if (mpi_comm_size < 2)
+    {
+        perror("At least 2 MPI processors are required.");
+        MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
+        return NULL;
+    }
+
+    int *mpi_stripe;
+    int mpi_index;
+    int mpi_index_row;
+    int mpi_index_start;
+    int mpi_index_finish;
+    int mpi_index_column;
+
+    const MatrixInt const *RESULT = matrix_int_init(matrix1->rows, matrix2->columns);
+
+    if (RESULT == NULL)
+    {
+        return NULL;
+    }
 
     if (mpi_comm_rank == MPI_ROOT_RANK)
     {
-        printf("Execution time: %.3f seconds\n", (double)(CLOCK_FINISH - CLOCK_START) / CLOCKS_PER_SEC);
+        const clock_t TIMESTEP_START = clock();
+
+        MPI_Status status_scattering, status_gathering_index_start, status_gathering_index_finish, status_gathering_stripe;
+        MPI_Request request_scattering, request_gathering_index_start, request_gathering_index_finish, request_gathering_stripe;
+
+        const int TOTAL_TASKS = (matrix1->rows * matrix2->columns);
+        const int WORKER_PAYLOAD = TOTAL_TASKS / mpi_comm_size;
+
+        for (int i = 1; i < mpi_comm_size; ++i)
+        {
+            mpi_index_start = (i - 1) * WORKER_PAYLOAD;
+            mpi_index_finish = (i == (mpi_comm_size - 1)) ? TOTAL_TASKS : mpi_index_start + WORKER_PAYLOAD;
+
+            MPI_Isend(&mpi_index_start, 1, MPI_INT, i, MPI_TAG_ROOT_MESSAGE, MPI_COMM_WORLD, &request_scattering);
+            MPI_Isend(&mpi_index_finish, 1, MPI_INT, i, MPI_TAG_ROOT_MESSAGE, MPI_COMM_WORLD, &request_scattering);
+        }
+
+        for (int i = 1; i < mpi_comm_size; ++i)
+        {
+            MPI_Irecv(&mpi_index_start, 1, MPI_INT, i, MPI_TAG_WORKER_MESSAGE, MPI_COMM_WORLD, &request_gathering_index_start);
+            MPI_Irecv(&mpi_index_finish, 1, MPI_INT, i, MPI_TAG_WORKER_MESSAGE, MPI_COMM_WORLD, &request_gathering_index_finish);
+
+            MPI_Wait(&request_gathering_index_start, &status_gathering_index_start);
+            MPI_Wait(&request_gathering_index_finish, &status_gathering_index_finish);
+
+            mpi_index = 0;
+            mpi_stripe = (int*)malloc((mpi_index_finish - mpi_index_start) * sizeof(int));
+
+            if (mpi_stripe == NULL)
+            {
+                perror("matrix_int_multiply_mpi_non_blocking. Memory allocation failed.");
+                MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
+                return NULL;
+            }
+
+            MPI_Irecv(mpi_stripe, (mpi_index_finish - mpi_index_start), MPI_INT, i, MPI_TAG_WORKER_MESSAGE, MPI_COMM_WORLD, &request_gathering_stripe);
+            MPI_Wait(&request_gathering_stripe, &status_gathering_stripe);
+
+            for (int j = mpi_index_start; j < mpi_index_finish; ++j)
+            {
+                mpi_index_row = j / matrix1->columns;
+                mpi_index_column = j % matrix2->columns;
+
+                matrix_int_set(RESULT, mpi_index_row, mpi_index_column, *(mpi_stripe + mpi_index++));
+            }
+
+            free(mpi_stripe);
+        }
+
+        const clock_t TIMESTEP_FINISH = clock();
+
+        printf("matrix_int_multiply_mpi_non_blocking. Execution time: %.3f seconds.\n", (double)(TIMESTEP_FINISH - TIMESTEP_START) / CLOCKS_PER_SEC);
+    }
+    else
+    {
+        int sum;
+        int *matrix_row;
+        int *matrix_column;
+
+        MPI_Status status_index_start, status_index_finish, status_sending_stripe;
+        MPI_Request request_index_start, request_index_finish, request_sending_stripe, request_callback;
+
+        MPI_Irecv(&mpi_index_start, 1, MPI_INT, MPI_ROOT_RANK, MPI_TAG_ROOT_MESSAGE, MPI_COMM_WORLD, &request_index_start);
+        MPI_Irecv(&mpi_index_finish, 1, MPI_INT, MPI_ROOT_RANK, MPI_TAG_ROOT_MESSAGE, MPI_COMM_WORLD, &request_index_finish);
+
+        MPI_Wait(&request_index_start, &status_index_start);
+        MPI_Wait(&request_index_finish, &status_index_finish);
+
+        mpi_index = 0;
+        mpi_stripe = (int*)malloc((mpi_index_finish - mpi_index_start) * sizeof(int));
+
+        if (mpi_stripe == NULL)
+        {
+            perror("matrix_int_multiply_mpi_non_blocking. Memory allocation failed.");
+            MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
+            return NULL;
+        }
+
+        for (int i = mpi_index_start; i < mpi_index_finish; ++i)
+        {
+            sum = 0;
+
+            mpi_index_row = i / matrix1->columns;
+            mpi_index_column = i % matrix2->columns;
+
+            matrix_row = matrix_int_get_row(matrix1, mpi_index_row);
+            matrix_column = matrix_int_get_column(matrix2, mpi_index_column);
+
+            for (int j = 0; j < matrix1->columns; ++j)
+            {
+                sum += (*(matrix_row + j)) * (*(matrix_column + j));
+            }
+
+            *(mpi_stripe + mpi_index++) = sum;
+
+            free(matrix_column);
+        }
+
+        MPI_Isend(&mpi_index_start, 1, MPI_INT, MPI_ROOT_RANK, MPI_TAG_WORKER_MESSAGE, MPI_COMM_WORLD, &request_callback);
+        MPI_Isend(&mpi_index_finish, 1, MPI_INT, MPI_ROOT_RANK, MPI_TAG_WORKER_MESSAGE, MPI_COMM_WORLD, &request_callback);
+        MPI_Isend(mpi_stripe, mpi_index, MPI_INT, MPI_ROOT_RANK, MPI_TAG_WORKER_MESSAGE, MPI_COMM_WORLD, &request_sending_stripe);
+
+        MPI_Wait(&request_sending_stripe, &status_sending_stripe);
+
+        free(mpi_stripe);
     }
 
-    return result;
+    return RESULT;
 }
 
 # pragma endregion
-
-void matrix_int_print(const MatrixInt* const matrix)
-{
-    if (matrix == NULL)
-    {
-        perror("Invalid matrix argument");
-        return;
-    }
-
-    for (int i = 0; i < matrix->rows; ++i)
-    {
-        for (int j = 0; j < matrix->columns; ++j)
-        {
-            printf("%d ", matrix->matrix[i][j]);
-        }
-        printf("\n");
-    }
-}

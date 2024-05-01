@@ -35,6 +35,6 @@ bool matrix_int_are_equal(const MatrixInt const *matrix1, const MatrixInt const 
 
 MatrixInt* matrix_int_multiply_sequential(const MatrixInt const *matrix1, const MatrixInt const *matrix2);
 MatrixInt* matrix_int_multiply_mpi_blocking(const MatrixInt const *matrix1, const MatrixInt const *matrix2);
-//MatrixInt* matrix_int_multiply_mpi_non_blocking(const MatrixInt const* matrix_1, const MatrixInt const* matrix_2);
+MatrixInt* matrix_int_multiply_mpi_non_blocking(const MatrixInt const *matrix1, const MatrixInt const *matrix2);
 
 # pragma endregion

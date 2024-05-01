@@ -19,14 +19,14 @@
     <Filter Include="src\common">
       <UniqueIdentifier>{ae804889-2f63-4114-8e48-60f495b953d3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\6.1">
-      <UniqueIdentifier>{097d361f-1eb0-4e27-b250-af532f773de9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\6.2">
-      <UniqueIdentifier>{3c1a9832-a47c-4cc0-a759-8eeb7ea9e90f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="inc\matrix">
       <UniqueIdentifier>{1381d48a-ed38-4cf0-9c2f-e7384e1bf3ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\6.1">
+      <UniqueIdentifier>{551d24e6-70cb-4ec8-b6e1-768ea12e1964}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\6.2">
+      <UniqueIdentifier>{2504bfd4-b9d0-4acb-996e-3b30fd4c2a78}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -69,11 +69,14 @@
     </Library>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\common\matrix.c">
+      <Filter>src\common</Filter>
+    </ClCompile>
     <ClCompile Include="src\6.1\main.c">
       <Filter>src\6.1</Filter>
     </ClCompile>
-    <ClCompile Include="src\common\matrix.c">
-      <Filter>src\common</Filter>
+    <ClCompile Include="src\6.2\main.c">
+      <Filter>src\6.2</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
