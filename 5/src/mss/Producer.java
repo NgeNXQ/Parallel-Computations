@@ -4,8 +4,8 @@ public final class Producer implements Runnable
 {
     public static final Task INTERRUPT_VALUE = null;
 
-    private static final long DELAY_SIMULATION_MIN_MS = 1000;
-    private static final long DELAY_SIMULATION_MAX_MS = 5000;
+    private static final long DELAY_SIMULATION_MIN_MS = 500;
+    private static final long DELAY_SIMULATION_MAX_MS = 1000;
 
     private final int TASKS_COUNT;
     private final TaskBuffer TASK_BUFFER;

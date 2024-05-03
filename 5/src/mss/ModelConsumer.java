@@ -92,6 +92,7 @@ public final class ModelConsumer implements Runnable
                 {
                     this.totalCompletedTasks.incrementAndGet();
                     this.POOL[i].executeTask(task);
+                    task = null;
                     break;
                 }
 
@@ -127,7 +128,7 @@ public final class ModelConsumer implements Runnable
 
             this.PENDING_TASKS_DUMPS.add(this.PENDING_TASKS.size());
 
-            Logger.getInstance().logMessageScheduled(Thread.currentThread(), String.format("MODEL #%d SCHEDULED LOG | Submitted: %d; Completed: %d; Refused: %d.", this.ID, this.totalSubmittedTasks.get(), this.totalCompletedTasks.get(), this.totalRefusedTasks.get()));
+            Logger.getInstance().logMessageScheduled(Thread.currentThread(), String.format("MODEL #%d SCHEDULED LOG | Submitted: %d; Completed: %d; Refused: %d | Queue: %d.", this.ID, this.totalSubmittedTasks.get(), this.totalCompletedTasks.get(), this.totalRefusedTasks.get(), this.PENDING_TASKS.size()));
         }
 
         for (Channel channel : this.POOL)

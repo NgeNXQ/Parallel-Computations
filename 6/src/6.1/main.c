@@ -19,8 +19,8 @@ int main(const int argc, const char const **argv)
     MPI_Comm_rank(MPI_COMM_WORLD, &mpi_comm_rank);
     MPI_Comm_size(MPI_COMM_WORLD, &mpi_comm_size);
 
-    MatrixInt const *matrix1 = matrix_int_init(5000, 5000);
-    MatrixInt const *matrix2 = matrix_int_init(5000, 5000);
+    MatrixInt const *matrix1 = matrix_int_init(500, 500);
+    MatrixInt const *matrix2 = matrix_int_init(500, 500);
 
     if (mpi_comm_rank == MPI_ROOT_RANK)
     {
