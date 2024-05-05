@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="inc">
+      <UniqueIdentifier>{bec56d7d-8a27-4160-8a9e-424da47b8398}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lib">
+      <UniqueIdentifier>{2e67f82e-341e-42c1-ac75-a4f02708c233}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{d0af92c2-a300-4a35-8441-3f3ae530446d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="inc\msmpi">
+      <UniqueIdentifier>{82daf061-e9bd-4c8b-a3bc-05ad998623b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="inc\matrix">
+      <UniqueIdentifier>{3bd09499-8f3b-47a6-9874-b862ebea1c30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lib\msmpi">
+      <UniqueIdentifier>{7d1dc615-3ff5-4537-8a05-573dedd1edd2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\common">
+      <UniqueIdentifier>{b2bbd017-21c6-4d62-b424-fac973ae4427}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\task">
+      <UniqueIdentifier>{43966501-cbca-4294-b2e5-c72f52933d84}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\task\main.c">
+      <Filter>src\task</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\matrix.c">
+      <Filter>src\common</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="inc\matrix\matrix.h">
+      <Filter>inc\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\msmpi\mpi.h">
+      <Filter>inc\msmpi</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\msmpi\mpif.h">
+      <Filter>inc\msmpi</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\msmpi\mpifptr.h">
+      <Filter>inc\msmpi</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\msmpi\mpio.h">
+      <Filter>inc\msmpi</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\msmpi\mspms.h">
+      <Filter>inc\msmpi</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\msmpi\pmidbg.h">
+      <Filter>inc\msmpi</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="lib\msmpi\msmpifmc.lib">
+      <Filter>lib\msmpi</Filter>
+    </Library>
+    <Library Include="lib\msmpi\msmpifec.lib">
+      <Filter>lib\msmpi</Filter>
+    </Library>
+    <Library Include="lib\msmpi\msmpi.lib">
+      <Filter>lib\msmpi</Filter>
+    </Library>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="inc\msmpi\mpi.f90">
+      <Filter>inc\msmpi</Filter>
+    </None>
+  </ItemGroup>
+</Project>
