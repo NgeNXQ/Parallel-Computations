@@ -18,39 +18,11 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="inc\msmpi\mpi.f90" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="inc\matrix\matrix.h" />
-    <ClInclude Include="inc\msmpi\mpi.h" />
-    <ClInclude Include="inc\msmpi\mpif.h" />
-    <ClInclude Include="inc\msmpi\mpifptr.h" />
-    <ClInclude Include="inc\msmpi\mpio.h" />
-    <ClInclude Include="inc\msmpi\mspms.h" />
-    <ClInclude Include="inc\msmpi\pmidbg.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="lib\msmpi\msmpi.lib" />
-    <Library Include="lib\msmpi\msmpifec.lib" />
-    <Library Include="lib\msmpi\msmpifmc.lib" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="src\6.1\main.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="src\6.2\main.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="src\common\matrix.c" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{ea79f595-3372-46d4-b533-9cb00b04f893}</ProjectGuid>
-    <RootNamespace>Labwork6</RootNamespace>
+    <ProjectGuid>{3bbdafa2-5f6a-4afa-b0af-944d31a0661b}</ProjectGuid>
+    <RootNamespace>Labwork7</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -99,11 +71,11 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(SolutionDir)6\bin\</OutDir>
+    <OutDir>$(ProjectDir)bin</OutDir>
     <IntDir>bin\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(SolutionDir)6\bin\</OutDir>
+    <OutDir>$(ProjectDir)bin</OutDir>
     <IntDir>bin\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -140,14 +112,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)inc\msmpi;$(ProjectDir)inc\matrix</AdditionalIncludeDirectories>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <CompileAs>CompileAsC</CompileAs>
-      <AdditionalIncludeDirectories>$(ProjectDir)inc\msmpi;$(ProjectDir)inc\matrix;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)lib\msmpi;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -159,19 +130,39 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)inc\msmpi;$(ProjectDir)inc\matrix</AdditionalIncludeDirectories>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <CompileAs>CompileAsC</CompileAs>
-      <AdditionalIncludeDirectories>$(ProjectDir)inc\msmpi;$(ProjectDir)inc\matrix;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)lib\msmpi;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="inc\matrix\matrix.h" />
+    <ClInclude Include="inc\msmpi\mpi.h" />
+    <ClInclude Include="inc\msmpi\mpif.h" />
+    <ClInclude Include="inc\msmpi\mpifptr.h" />
+    <ClInclude Include="inc\msmpi\mpio.h" />
+    <ClInclude Include="inc\msmpi\mspms.h" />
+    <ClInclude Include="inc\msmpi\pmidbg.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="inc\msmpi\mpi.f90" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="lib\msmpi\msmpi.lib" />
+    <Library Include="lib\msmpi\msmpifec.lib" />
+    <Library Include="lib\msmpi\msmpifmc.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\common\matrix.c" />
+    <ClCompile Include="src\task\main.c" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
